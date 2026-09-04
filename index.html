@@ -68,7 +68,7 @@
             position: relative;
         }
 
-        .menu-item a {
+        .menu-link {
             display: flex;
             align-items: center;
             padding: 12px 20px;
@@ -80,14 +80,14 @@
             word-break: break-word;
         }
 
-        .menu-item a:hover,
-        .menu-item a.active {
+        .menu-link:hover,
+        .menu-link.active {
             background-color: #002277;
             color: #ffffff;
             font-weight: 600;
         }
 
-        .menu-item svg {
+        .menu-link svg {
             width: 18px;
             height: 18px;
             margin-right: 12px;
@@ -190,34 +190,34 @@
 
             <ul class="menu-list" id="menu-container">
                 <li class="menu-item">
-                    <a href="https://kokhant300532-ship-it.github.io/KK/" target="content-frame" class="active">
+                    <div class="menu-link active" onclick="loadFrame('https://kokhant300532-ship-it.github.io/KK/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
                         credit percent noti
-                    </a>
+                    </div>
                 </li>
                 <li class="menu-item">
-                    <a href="https://kokhant300532-ship-it.github.io/Point-/" target="content-frame">
+                    <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/Point-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                         Point-
-                    </a>
+                    </div>
                 </li>
                 <li class="menu-item">
-                    <a href="https://kokhant300532-ship-it.github.io/bankinfo-noti/" target="content-frame">
+                    <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/bankinfo-noti/', this)">
                         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                         bankinfo-noti
-                    </a>
+                    </div>
                 </li>
                 <li class="menu-item">
-                    <a href="https://kokhant300532-ship-it.github.io/split-noti/" target="content-frame">
+                    <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/split-noti/', this)">
                         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
                         split-noti
-                    </a>
+                    </div>
                 </li>
                 <li class="menu-item">
-                    <a href="https://kokhant300532-ship-it.github.io/bank-wrong-/#" target="content-frame">
+                    <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/bank-wrong-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
                         bank-wrong-
-                    </a>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -233,30 +233,36 @@
 
     <!-- Right Target Area -->
     <div class="main-content">
-        <iframe id="main-iframe" name="content-frame" src="https://kokhant300532-ship-it.github.io/credit-percent-noti/"></iframe>
+        <iframe id="main-iframe" src="https://kokhant300532-ship-it.github.io/KK/"></iframe>
     </div>
 
     <script>
+        const iframe = document.getElementById('main-iframe');
         const menuContainer = document.getElementById('menu-container');
 
-        // active class ချိန်ပေးသည့် function
-        function bindMenuEvents() {
-            const menuLinks = document.querySelectorAll('.menu-item a');
-            menuLinks.forEach(link => {
-                link.onclick = function() {
-                    menuLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                };
+        // Iframe ၏ URL ကို တိုက်ရိုက်ပြောင်းပေးမည့် Function
+        function loadFrame(url, element) {
+            // Iframe src ကို တိုက်ရိုက် အစားထိုးခြင်း
+            iframe.src = url;
+
+            // Active Highlight ချိန်ခြင်း
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.classList.remove('active');
             });
+            if (element) {
+                element.classList.add('active');
+            }
         }
 
-        // LocalStorage မှ saved pages များကို ခေါ်ယူခြင်း
+        // SessionStorage မှ Saved Pages များကို ပြန်ခေါ်ခြင်း
         function loadCustomPages() {
-            const savedPages = JSON.parse(localStorage.getItem('dashboard_custom_pages')) || [];
+            const savedPages = JSON.parse(sessionStorage.getItem('dashboard_custom_pages')) || [];
+            
+            document.querySelectorAll('.custom-item').forEach(el => el.remove());
+
             savedPages.forEach((page, index) => {
                 createPageMenuItem(page.title, page.url, index);
             });
-            bindMenuEvents();
         }
 
         // Page အသစ်ထည့်ခြင်း
@@ -272,41 +278,39 @@
                 return;
             }
 
-            const savedPages = JSON.parse(localStorage.getItem('dashboard_custom_pages')) || [];
+            const savedPages = JSON.parse(sessionStorage.getItem('dashboard_custom_pages')) || [];
             savedPages.push({ title, url });
-            localStorage.setItem('dashboard_custom_pages', JSON.stringify(savedPages));
+            sessionStorage.setItem('dashboard_custom_pages', JSON.stringify(savedPages));
 
             createPageMenuItem(title, url, savedPages.length - 1);
-            bindMenuEvents();
 
             titleInput.value = '';
             urlInput.value = '';
         }
 
-        // DOM တွင် Menu Item သစ် ဖန်တီးပေးခြင်း
+        // Dynamic Menu Item ဖန်တီးခြင်း
         function createPageMenuItem(title, url, index) {
             const li = document.createElement('li');
             li.className = 'menu-item custom-item';
             li.innerHTML = `
-                <a href="${url}" target="content-frame" style="flex-grow: 1;">
+                <div class="menu-link" onclick="loadFrame('${url}', this)" style="flex-grow: 1;">
                     <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     ${title}
-                </a>
-                <button class="delete-btn" onclick="removeCustomPage(${index}, this)" title="Remove Page">×</button>
+                </div>
+                <button class="delete-btn" onclick="removeCustomPage(${index})" title="Remove Page">×</button>
             `;
             menuContainer.appendChild(li);
         }
 
-        // Page ပြန်လည်ဖျက်ထုတ်ခြင်း
-        function removeCustomPage(index, element) {
-            let savedPages = JSON.parse(localStorage.getItem('dashboard_custom_pages')) || [];
+        // Page ပြန်ဖျက်ခြင်း
+        function removeCustomPage(index) {
+            let savedPages = JSON.parse(sessionStorage.getItem('dashboard_custom_pages')) || [];
             savedPages.splice(index, 1);
-            localStorage.setItem('dashboard_custom_pages', JSON.stringify(savedPages));
-            element.parentElement.remove();
+            sessionStorage.setItem('dashboard_custom_pages', JSON.stringify(savedPages));
+            loadCustomPages();
         }
 
         // Initialize Page
-        bindMenuEvents();
         loadCustomPages();
     </script>
 </body>
