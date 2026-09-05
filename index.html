@@ -180,7 +180,6 @@
 </head>
 <body>
 
-    <!-- Left Navigation Bar -->
     <div class="sidebar">
         <div class="sidebar-top">
             <div class="brand-header">
@@ -219,10 +218,15 @@
                         bank-wrong-
                     </div>
                 </li>
+                <li class="menu-item">
+                    <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/bank-error-noti/', this)">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        Bank error noti
+                    </div>
+                </li>
             </ul>
         </div>
 
-        <!-- Add New Page Box -->
         <div class="add-page-box">
             <h4>+ Add Custom Page</h4>
             <input type="text" id="page-title" placeholder="Page Title (e.g. My-Card)">
@@ -231,7 +235,6 @@
         </div>
     </div>
 
-    <!-- Right Target Area -->
     <div class="main-content">
         <iframe id="main-iframe" src="https://kokhant300532-ship-it.github.io/KK/"></iframe>
     </div>
