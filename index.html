@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Browser Cache မသိမ်းဆည်းစေရန် ထည့်သွင်းထားသော Meta Tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>My Web Dashboard</title>
     <style>
         * {
@@ -183,7 +189,6 @@
     <div class="sidebar">
         <div class="sidebar-top">
             <div class="brand-header">
-                <!-- Image URL တွင် Cache Busting Version ထည့်သွင်းထားခြင်း -->
                 <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png?v=1.0.0" alt="Logo">
                 <span>My Web<br>Dashboard</span>
             </div>
@@ -261,22 +266,23 @@
     </div>
 
     <div class="main-content">
-        <iframe id="main-iframe" src="https://kokhant300532-ship-it.github.io/KK/"></iframe>
+        <iframe id="main-iframe" src=""></iframe>
     </div>
 
     <script>
         const iframe = document.getElementById('main-iframe');
         const menuContainer = document.getElementById('menu-container');
 
-        // Dashboard Version သတ်မှတ်ခြင်း (အပြောင်းအလဲလုပ်တိုင်း v အသစ်ပြောင်းပါ)
-        const DASHBOARD_VERSION = "1.0.1";
+        // Dynamic Cache Busting Parameter ထုတ်ပေးသည့် Function
+        function getCacheBuster() {
+            return new Date().getTime();
+        }
 
-        // Cache Busting အသုံးပြု၍ iFrame သို့ URL ခေါ်ယူသည့် Function
+        // Cache မငြိဘဲ တိုက်ရိုက် အသစ်ပြောင်းစေရန် iFrame ခေါ်ယူသည့် Function
         function loadFrame(baseUrl, element) {
-            // URL ထဲတွင် Query Parameter ပါ/မပါ စစ်ဆေးပြီး Version Number ထည့်ပေးခြင်း
-            const cacheBustedUrl = baseUrl.includes('?') 
-                ? `${baseUrl}&v=${DASHBOARD_VERSION}` 
-                : `${baseUrl}?v=${DASHBOARD_VERSION}`;
+            // URL ထဲသို့ Dynamic Timestamp Parameter (_t=...) ထည့်ပေးခြင်း
+            const separator = baseUrl.includes('?') ? '&' : '?';
+            const cacheBustedUrl = `${baseUrl}${separator}_t=${getCacheBuster()}`;
 
             iframe.src = cacheBustedUrl;
 
@@ -345,7 +351,7 @@
             loadCustomPages();
         }
 
-        // Initial Page Load (Default Frame ကိုလည်း Version ဖြင့် ခေါ်ယူခြင်း)
+        // Initial Page Load (အစတွင် Default Frame ကို Dynamic Timestamp ဖြင့် ခေါ်ယူခြင်း)
         loadFrame('https://kokhant300532-ship-it.github.io/KK/', document.querySelector('.menu-link.active'));
         loadCustomPages();
     </script>
