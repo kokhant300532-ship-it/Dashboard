@@ -4,13 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Browser Cache မသိမ်းဆည်းစေရန် ထည့်သွင်းထားသော Meta Tags -->
+    <!-- Cache Control -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>My Web Dashboard</title>
+    <title>F1 Dashboard</title>
     <style>
+        :root {
+            --bg-dark: #0f172a;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --card-bg: #0f172a;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --sidebar-width: 270px;
+            --sidebar-collapsed-width: 70px;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -21,160 +34,269 @@
         body {
             display: flex;
             height: 100vh;
-            background-color: #0d1117;
-            color: #ffffff;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             overflow: hidden;
         }
 
-        /* Sidebar Styling */
+        /* Sidebar Wrapper */
         .sidebar {
-            width: 250px;
-            background-color: #0033a0;
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            padding-top: 15px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
-            justify-content: space-between;
+            z-index: 100;
+            position: relative;
         }
 
-        .sidebar-top {
-            overflow-y: auto;
-            flex-grow: 1;
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
         }
 
+        /* Sidebar Header */
         .brand-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            height: 65px;
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
             gap: 12px;
-            padding: 10px 20px 20px 20px;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
-        .brand-header img {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: white;
-            padding: 2px;
+        /* F1 Icon Box */
+        .f1-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
-        .brand-header span {
-            font-size: 18px;
-            font-weight: bold;
+        .brand-info span {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
             line-height: 1.2;
+            transition: opacity 0.2s;
         }
 
-        /* Menu Items */
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--sidebar-hover);
+            color: var(--text-main);
+        }
+
+        /* Search Box */
+        .search-box {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .sidebar.collapsed .search-box,
+        .sidebar.collapsed .brand-info span,
+        .sidebar.collapsed .add-page-box h4,
+        .sidebar.collapsed .add-page-box input,
+        .sidebar.collapsed .add-page-btn span {
+            display: none;
+        }
+
+        /* Menu Navigation */
+        .sidebar-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 12px 8px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: var(--sidebar-hover);
+            border-radius: 4px;
+        }
+
         .menu-list {
             list-style: none;
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
 
         .menu-item {
             position: relative;
+            border-radius: 8px;
         }
 
         .menu-link {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
-            color: #e1e9ff;
+            padding: 10px 12px;
+            color: var(--text-muted);
             text-decoration: none;
-            font-size: 14px;
-            transition: background 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
             cursor: pointer;
-            word-break: break-word;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .menu-link:hover,
+        .menu-link:hover {
+            background-color: var(--sidebar-hover);
+            color: var(--text-main);
+        }
+
         .menu-link.active {
-            background-color: #002277;
+            background-color: var(--accent-blue);
             color: #ffffff;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .menu-link svg {
-            width: 18px;
-            height: 18px;
-            margin-right: 12px;
+            width: 20px;
+            height: 20px;
             fill: currentColor;
             flex-shrink: 0;
+            margin-right: 12px;
         }
 
-        /* Custom Dynamic Link Styling */
-        .custom-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .sidebar.collapsed .menu-link svg {
+            margin-right: 0;
         }
 
+        .sidebar.collapsed .menu-link {
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .sidebar.collapsed .menu-text {
+            display: none;
+        }
+
+        /* Icon Colors */
+        .c-yellow svg { color: #f59e0b; }
+        .c-orange svg { color: #f97316; }
+        .c-green svg { color: #10b981; }
+        .c-blue svg { color: #38bdf8; }
+        .c-pink svg { color: #ec4899; }
+        .c-purple svg { color: #a855f7; }
+        .menu-link.active svg { color: #ffffff !important; }
+
+        /* Delete Button */
         .delete-btn {
             background: transparent;
             border: none;
-            color: #ff6b6b;
+            color: #ef4444;
             font-size: 16px;
             cursor: pointer;
-            padding: 0 10px;
+            padding: 0 8px;
             display: none;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .menu-item:hover .delete-btn {
             display: block;
         }
 
-        /* Add Page Section */
+        .sidebar.collapsed .delete-btn {
+            display: none !important;
+        }
+
+        /* Add Page Bottom Box */
         .add-page-box {
-            padding: 15px;
-            background-color: #002277;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(15, 23, 42, 0.5);
         }
 
         .add-page-box h4 {
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
-            color: #9bb5ff;
+            color: var(--text-muted);
             margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
 
         .add-page-box input {
             width: 100%;
-            padding: 8px 10px;
-            margin-bottom: 8px;
-            background: #0d1117;
-            border: 1px solid #1f293d;
-            border-radius: 4px;
-            color: #ffffff;
+            padding: 7px 10px;
+            margin-bottom: 6px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
             font-size: 12px;
             outline: none;
-        }
-
-        .add-page-box input:focus {
-            border-color: #3b82f6;
         }
 
         .add-page-btn {
             width: 100%;
             padding: 8px;
-            background-color: #2563eb;
+            background: #2563eb;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .add-page-btn:hover {
-            background-color: #1d4ed8;
+            background: #1d4ed8;
         }
 
-        /* Main Display Area */
+        /* Main Content Frame */
         .main-content {
             flex-grow: 1;
             height: 100vh;
-            background: #0d1117;
+            background: var(--bg-dark);
         }
 
         iframe {
@@ -186,108 +308,132 @@
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-top">
-            <div class="brand-header">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png?v=1.0.0" alt="Logo">
-                <span>My Web<br>Dashboard</span>
+    <div class="sidebar" id="sidebar">
+        <!-- Brand Header (F1 Icon ပြောင်းလဲထားပါသည်) -->
+        <div class="brand-header">
+            <div class="brand-info">
+                <div class="f1-icon-box" title="F1 Dashboard">
+                    <!-- F1 Racing Flag / Car SVG Icon -->
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.41 4.59L18 3.17c-.39-.39-1.03-.39-1.41 0L14 5.76 12.59 4.34c-.39-.39-1.03-.39-1.41 0L9.76 5.76 8.34 4.34c-.39-.39-1.03-.39-1.41 0L4.59 6.76c-.39.39-.39 1.02 0 1.41l1.42 1.42L3.17 12.41c-.39.39-.39 1.02 0 1.41l1.42 1.42-2.83 2.83c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l2.83-2.83 1.42 1.42c.39.39 1.02.39 1.41 0l2.83-2.83 1.42 1.42c.39.39 1.02.39 1.41 0l2.83-2.83 1.42 1.42c.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-2.83-2.83 1.42-1.42c.39-.39.39-1.02 0-1.41l-1.42-1.42 2.83-2.83c.38-.39.38-1.03 0-1.41zM7 11.5L5.5 10l3-3L10 8.5l-3 3zm5 0L10.5 10l3-3l1.5 1.5-3 3zm5 0L15.5 10l3-3l1.5 1.5-3 3z"/>
+                    </svg>
+                </div>
+                <span>F1 Dashboard</span>
             </div>
+            <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+        </div>
 
+        <!-- Search Bar -->
+        <div class="search-box">
+            <input type="text" id="searchInput" onkeyup="filterMenu()" placeholder="Search pages...">
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="sidebar-menu">
             <ul class="menu-list" id="menu-container">
-                <!-- 1. Yellow Color Group -->
-                <li class="menu-item">
+                <!-- Group 1 -->
+                <li class="menu-item c-blue">
                     <div class="menu-link active" onclick="loadFrame('https://kokhant300532-ship-it.github.io/KK/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                        credit percent noti
+                        <span class="menu-text">credit percent noti</span>
                     </div>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item c-yellow">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/Point-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        Point-
+                        <span class="menu-text">Point-</span>
                     </div>
                 </li>
 
-                <!-- 2. Orange Color Group -->
-                <li class="menu-item">
+                <!-- Group 2 -->
+                <li class="menu-item c-orange">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/bankinfo-noti/', this)">
                         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                        bank info-noti %
+                        <span class="menu-text">bank info-noti %</span>
                     </div>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item c-orange">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/bank-wrong-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-                        bank-wrong-
+                        <span class="menu-text">bank-wrong-</span>
                     </div>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item c-orange">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/Bank-error-noti---22/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        bank noti alert
+                        <span class="menu-text">bank noti alert</span>
                     </div>
                 </li>
 
-                <!-- 3. Green Color Group -->
-                <li class="menu-item">
+                <!-- Group 3 -->
+                <li class="menu-item c-green">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/split-noti/', this)">
                         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-                        split-noti
+                        <span class="menu-text">split-noti</span>
                     </div>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item c-green">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/split-withdraw-instruction-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                        split withdraw instruction
+                        <span class="menu-text">split withdraw instruction</span>
                     </div>
                 </li>
 
-                <!-- 4. White / Light Blue Group -->
-                <li class="menu-item">
+                <!-- Group 4 -->
+                <li class="menu-item c-blue">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/tax-file/', this)">
                         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                        Tax file
+                        <span class="menu-text">Tax file</span>
                     </div>
                 </li>
 
-                <!-- 5. Pink Color Group (Crown Icons) -->
-                <li class="menu-item">
+                <!-- Group 5 -->
+                <li class="menu-item c-pink">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/VIP/', this)">
                         <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
-                        VIP
+                        <span class="menu-text">VIP</span>
                     </div>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item c-pink">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/VIP-noti-card/', this)">
                         <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
-                        VIP noti card
+                        <span class="menu-text">VIP noti card</span>
                     </div>
                 </li>
-                <!-- 6. Data Separation Page -->
-                <li class="menu-item">
+
+                <!-- Group 6 -->
+                <li class="menu-item c-purple">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/Data-Separation-/', this)">
                         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                        Data Separation
+                        <span class="menu-text">Data Separation</span>
                     </div>
                 </li>
-                <!-- 7. Creadit point noti Page (မတူညီသော Star Shield/Credit Badge Icon ထည့်သွင်းထားပါသည်) -->
-                <li class="menu-item">
+
+                <!-- Group 7 -->
+                <li class="menu-item c-blue">
                     <div class="menu-link" onclick="loadFrame('https://kokhant300532-ship-it.github.io/Creadit-point-noti/', this)">
                         <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 13.5l-3.5-3.5 1.41-1.41L11 11.67l5.09-5.09 1.41 1.41L11 14.5z"/></svg>
-                        Creadit point noti
+                        <span class="menu-text">Creadit point noti</span>
                     </div>
                 </li>
             </ul>
         </div>
 
+        <!-- Add Custom Page Footer Section -->
         <div class="add-page-box">
-            <h4>+ Add Custom Page</h4>
-            <input type="text" id="page-title" placeholder="Page Title (e.g. My-Card)">
-            <input type="url" id="page-url" placeholder="Page URL (https://...)">
-            <button class="add-page-btn" onclick="addCustomPage()">Add Page</button>
+            <h4>+ Custom Page</h4>
+            <input type="text" id="page-title" placeholder="Title (e.g. My-Card)">
+            <input type="url" id="page-url" placeholder="URL (https://...)">
+            <button class="add-page-btn" onclick="addCustomPage()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span>Add Page</span>
+            </button>
         </div>
     </div>
 
+    <!-- Main View Frame -->
     <div class="main-content">
         <iframe id="main-iframe" src=""></iframe>
     </div>
@@ -295,21 +441,40 @@
     <script>
         const iframe = document.getElementById('main-iframe');
         const menuContainer = document.getElementById('menu-container');
+        const sidebar = document.getElementById('sidebar');
 
-        // Dynamic Cache Busting Parameter ထုတ်ပေးသည့် Function
+        // Sidebar Collapsible Function
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // Search Filter Function
+        function filterMenu() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const items = menuContainer.getElementsByClassName('menu-item');
+
+            Array.from(items).forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+
+        // Cache Buster
         function getCacheBuster() {
             return new Date().getTime();
         }
 
-        // Cache မငြိဘဲ တိုက်ရိုက် အသစ်ပြောင်းစေရန် iFrame ခေါ်ယူသည့် Function
+        // Load Frame Function
         function loadFrame(baseUrl, element) {
-            // URL ထဲသို့ Dynamic Timestamp Parameter (_t=...) ထည့်ပေးခြင်း
             const separator = baseUrl.includes('?') ? '&' : '?';
             const cacheBustedUrl = `${baseUrl}${separator}_t=${getCacheBuster()}`;
 
             iframe.src = cacheBustedUrl;
 
-            // Active State ချိန်ညှိခြင်း
             document.querySelectorAll('.menu-link').forEach(link => {
                 link.classList.remove('active');
             });
@@ -318,10 +483,9 @@
             }
         }
 
-        // SessionStorage မှ Saved Pages များကို ပြန်ခေါ်ခြင်း
+        // Load Saved Pages from SessionStorage
         function loadCustomPages() {
             const savedPages = JSON.parse(sessionStorage.getItem('dashboard_custom_pages')) || [];
-            
             document.querySelectorAll('.custom-item').forEach(el => el.remove());
 
             savedPages.forEach((page, index) => {
@@ -329,7 +493,7 @@
             });
         }
 
-        // Custom Page အသစ်ထည့်ခြင်း
+        // Add Custom Page
         function addCustomPage() {
             const titleInput = document.getElementById('page-title');
             const urlInput = document.getElementById('page-url');
@@ -352,21 +516,21 @@
             urlInput.value = '';
         }
 
-        // Dynamic Menu Item ဖန်တီးခြင်း
+        // Create Custom Page Menu Item
         function createPageMenuItem(title, url, index) {
             const li = document.createElement('li');
-            li.className = 'menu-item custom-item';
+            li.className = 'menu-item custom-item c-blue';
             li.innerHTML = `
-                <div class="menu-link" onclick="loadFrame('${url}', this)" style="flex-grow: 1;">
+                <div class="menu-link" onclick="loadFrame('${url}', this)">
                     <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    ${title}
+                    <span class="menu-text">${title}</span>
                 </div>
                 <button class="delete-btn" onclick="removeCustomPage(${index})" title="Remove Page">×</button>
             `;
             menuContainer.appendChild(li);
         }
 
-        // Custom Page ပြန်ဖျက်ခြင်း
+        // Remove Custom Page
         function removeCustomPage(index) {
             let savedPages = JSON.parse(sessionStorage.getItem('dashboard_custom_pages')) || [];
             savedPages.splice(index, 1);
@@ -374,7 +538,7 @@
             loadCustomPages();
         }
 
-        // Initial Page Load (အစတွင် Default Frame ကို Dynamic Timestamp ဖြင့် ခေါ်ယူခြင်း)
+        // Initial Load
         loadFrame('https://kokhant300532-ship-it.github.io/KK/', document.querySelector('.menu-link.active'));
         loadCustomPages();
     </script>
