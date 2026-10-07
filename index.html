@@ -105,19 +105,42 @@
             background: #2563eb;
         }
 
+        /* Settings Toggle Header Button */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-bottom: 0 !important;
+        }
+
+        .toggle-icon {
+            font-size: 10px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .collapsible-content {
+            margin-top: 8px;
+        }
+
+        .collapsible-content.hidden {
+            display: none;
+        }
+
         /* Admin Change Password Box in Sidebar */
         .admin-box {
             padding: 14px;
             border-top: 1px solid var(--border-color);
             background-color: rgba(15, 23, 42, 0.8);
-        }
-
-        .admin-box h4 {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
         }
 
         .admin-box input {
@@ -148,7 +171,8 @@
             background: #059669;
         }
 
-        .sidebar.collapsed .admin-box {
+        .sidebar.collapsed .admin-box,
+        .sidebar.collapsed .add-page-box {
             display: none;
         }
 
@@ -243,10 +267,7 @@
         }
 
         .sidebar.collapsed .search-box,
-        .sidebar.collapsed .brand-info span,
-        .sidebar.collapsed .add-page-box h4,
-        .sidebar.collapsed .add-page-box input,
-        .sidebar.collapsed .add-page-btn span {
+        .sidebar.collapsed .brand-info span {
             display: none;
         }
 
@@ -362,14 +383,6 @@
             padding: 14px;
             border-top: 1px solid var(--border-color);
             background-color: rgba(15, 23, 42, 0.5);
-        }
-
-        .add-page-box h4 {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
         }
 
         .add-page-box input {
@@ -546,21 +559,31 @@
 
         <!-- Admin Change Password Section -->
         <div class="admin-box">
-            <h4>⚙️ Admin Settings</h4>
-            <input type="password" id="adminSecret" placeholder="Admin Secret Key">
-            <input type="password" id="newPassword" placeholder="New User Password">
-            <button class="admin-btn" onclick="changePassword()">Update Password</button>
+            <div class="section-header" onclick="toggleSection('adminContent', 'adminIcon')">
+                <h4>⚙️ Admin Settings</h4>
+                <span class="toggle-icon" id="adminIcon">▼</span>
+            </div>
+            <div class="collapsible-content hidden" id="adminContent">
+                <input type="password" id="adminSecret" placeholder="Admin Secret Key">
+                <input type="password" id="newPassword" placeholder="New User Password">
+                <button class="admin-btn" onclick="changePassword()">Update Password</button>
+            </div>
         </div>
 
         <!-- Add Custom Page Footer Section -->
         <div class="add-page-box">
-            <h4>+ Custom Page</h4>
-            <input type="text" id="page-title" placeholder="Title (e.g. My-Card)">
-            <input type="url" id="page-url" placeholder="URL (https://...)">
-            <button class="add-page-btn" onclick="addCustomPage()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                <span>Add Page</span>
-            </button>
+            <div class="section-header" onclick="toggleSection('customContent', 'customIcon')">
+                <h4>+ Custom Page</h4>
+                <span class="toggle-icon" id="customIcon">▼</span>
+            </div>
+            <div class="collapsible-content hidden" id="customContent">
+                <input type="text" id="page-title" placeholder="Title (e.g. My-Card)">
+                <input type="url" id="page-url" placeholder="URL (https://...)">
+                <button class="add-page-btn" onclick="addCustomPage()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    <span>Add Page</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -578,6 +601,19 @@
         const menuContainer = document.getElementById('menu-container');
         const sidebar = document.getElementById('sidebar');
         const loadedFrames = {};
+
+        // Toggle Admin/Custom Page Collapsible Sections
+        function toggleSection(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '▲';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '▼';
+            }
+        }
 
         // Get Password from localStorage
         function getSavedPassword() {
